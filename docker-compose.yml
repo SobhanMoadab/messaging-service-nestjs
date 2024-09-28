@@ -1,0 +1,41 @@
+version: '3'
+services:
+  messaging-service:
+    build: .
+    container_name: messaging_service
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/messages
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://rabbitmq
+      - JWT_SECRET=MessageSecretKey
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+
+  mongo:
+    image: mongo:5.0.15-focal
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db 
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672' # For RabbitMQ Management UI
+
+volumes:
+  mongo-data:
